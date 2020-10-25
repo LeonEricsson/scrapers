@@ -10,25 +10,57 @@ LOGIN_URL = "https://m.facebook.com/login/device-based/regular/login/?refsrc=htt
 URL = "https://mbasic.facebook.com/groups/dsaljer"
 
 
-with requests.Session() as session:
-    #Get HTML of login page
-    login = session.get(LOGIN_URL)
-    soup = BeautifulSoup(login.text, 'html.parser')
+#Scrapes URL and returns the html
+def scrapePage():
+    with requests.Session() as session:
+        #Get HTML of login page
+        login = session.get(LOGIN_URL)
+        soup = BeautifulSoup(login.text, 'html.parser')
 
-    #Find & set data values
-    inputs = soup.find('form', id='login_form').find_all('input', {'type': ['hidden', 'submit']})
-    input_data = {input.get('name'): input.get('value')  for input in inputs}
-    input_data['email'] = email
-    input_data['pass'] = password
+        #Find & set data values for login
+        inputs = soup.find('form', id='login_form').find_all('input', {'type': ['hidden', 'submit']})
+        input_data = {input.get('name'): input.get('value')  for input in inputs}
+        input_data['email'] = email
+        input_data['pass'] = password
 
-    #Request session with login data
-    post = session.post(LOGIN_URL, data=input_data)
-    page_html = session.get(URL)
-    
-    #Extract posts from URL
-    soup = BeautifulSoup(page_html.content, 'html.parser')
-    
+        #Request session to get passed login page and scrape URL
+        post = session.post(LOGIN_URL, data=input_data)
+        page_html = session.get(URL)
+        
+        return page_html
+
+#Extract posts from facebook page
+def getPosts(url_html):
+    #Parse html with beautifulsoup and retrieve posts
+    soup = BeautifulSoup(url_html.content, 'html.parser')
     posts = soup.find_all('div', class_='dw')
+    post_words = []
+
+    #Create list of words
     for post in posts:
-        print(post.text)
+        post_words += post.text.split()
+    
+    return post_words
+    
+        
+def findBook(book, post_words):
+    if book.upper() in (post_word.upper() for post_word in post_words):
+        print(True)
+    else:
+        print(False)
+
+
+def main():
+    url_html = scrapePage()
+    post_words = getPosts(url_html)
+    findBook("Södra", post_words)
+
+if __name__ == "__main__":
+    main()
+
+#Extract posts from desired URL
+
+
+
+    
 
