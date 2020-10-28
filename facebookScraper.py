@@ -3,7 +3,7 @@ import pprint
 import re
 from bs4 import BeautifulSoup
 
-email = "leon.ericsson@me.com"
+email = ""
 password = ""
 
 LOGIN_URL = "https://m.facebook.com/login/device-based/regular/login/?refsrc=https%3A%2F%2Fm.facebook.com%2F&lwv=100&refid=8"
